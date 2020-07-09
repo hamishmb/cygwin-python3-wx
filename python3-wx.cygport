@@ -4,7 +4,7 @@ inherit python3-distutils wxwidgets
 
 NAME="python3-wx"
 VERSION=4.0.7.post2
-RELEASE=1
+RELEASE=2
 CATEGORY="Python"
 SUMMARY="wxWidgets C++ application framework (Python 3 bindings)"
 DESCRIPTION="wxWidgets is a set of libraries that allows C++ applications to
@@ -28,16 +28,16 @@ python3_wx_common_CONTENTS="
     usr/share/doc
 "
 
-python36_wx_REQUIRES="python36 python36-six python36-numpy python3-wx-common"
+python36_wx_REQUIRES="python36 python36-six python36-numpy python3-wx-common python36-imaging"
 python36_wx_CONTENTS="
 	etc/
 	usr/bin/*-py36
-	${PYTHON3_SITELIB#/}/wx/
-	${PYTHON3_SITELIB#/}/wxPython-${VERSION}-*.egg-info
+	usr/lib/python3.6/site-packages/wx/
+	usr/lib/python3.6/site-packages/wxPython-${VERSION}-*.egg-info
 	usr/share/applications/*py36*
 "
 
-python37_wx_REQUIRES="python37 python37-six python37-numpy python3-wx-common"
+python37_wx_REQUIRES="python37 python37-six python37-numpy python37-imaging python3-wx-common"
 python37_wx_CONTENTS="
 	etc/
 	usr/bin/*-py37
@@ -86,8 +86,8 @@ src_install() {
     mv -v ${D}/usr/bin/wxdocs ${D}/usr/bin/wxdocs-py36
     mv -v ${D}/usr/bin/wxget ${D}/usr/bin/wxget-py36
 
-	make_desktop_entry pycrust-py36    PyCrust36     PyCrust "Development;GTK"
-	make_desktop_entry pyshell-py36    PyShell36     PyCrust "Development;GTK"
+	make_desktop_entry pycrust-py36    "PyCrust (Python 3.6)"     PyCrust "Development;GTK"
+	make_desktop_entry pyshell-py36    "PyShell (Python 3.6)"     PyCrust "Development;GTK"
 
     #Remove Python 3.7 DLLs that get installed in Python3.6's site-packages folder.
     find ${D}/usr/lib/python3.6/site-packages/wx/ -iname "*37m*" | xargs rm -v
@@ -109,8 +109,8 @@ src_install() {
     mv -v ${D}/usr/bin/wxdocs ${D}/usr/bin/wxdocs-py37
     mv -v ${D}/usr/bin/wxget ${D}/usr/bin/wxget-py37
 
-	make_desktop_entry pycrust-py37    PyCrust36     PyCrust "Development;GTK"
-	make_desktop_entry pyshell-py37    PyShell36     PyCrust "Development;GTK"
+	make_desktop_entry pycrust-py37    "PyCrust (Python 3.7)"    PyCrust "Development;GTK"
+	make_desktop_entry pyshell-py37    "PyShell (Python 3.7)"    PyCrust "Development;GTK"
 
     #Remove Python 3.6 DLLs that get installed in Python3.7's site-packages folder.
     find ${D}/usr/lib/python3.7/site-packages/wx/ -iname "*36m*" | xargs rm -v
