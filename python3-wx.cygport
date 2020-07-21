@@ -4,7 +4,7 @@ inherit python3-distutils wxwidgets
 
 NAME="python3-wx"
 VERSION=4.0.7.post2
-RELEASE=2
+RELEASE=3
 CATEGORY="Python"
 SUMMARY="wxWidgets C++ application framework (Python 3 bindings)"
 DESCRIPTION="wxWidgets is a set of libraries that allows C++ applications to
@@ -19,9 +19,9 @@ SRC_URI="https://files.pythonhosted.org/packages/b9/8b/31267dd6d026a082faed35ec8
 SRC_DIR="wxPython-${VERSION}"
 PATCH_URI=""
 
-BUILD_REQUIRES="libglut3 libglut-devel libgstreamer1.0-devel libGL-devel libGL1 libGLU-devel libGLU1 libgtk3-devel libgtk3_0 libjpeg-devel libjpeg8 libnotify-devel libnotify libpng-devel libpng16-devel libpng16 libSDL2-devel libSDL2_2.0_0 libSM-devel libSM6 libtiff-devel libtiff6 libwebkitgtk3.0-devel libwebkitgtk3.0_0 libXtst6 python36 python36-devel python36-six python36-numpy python36-setuptools python37 python37-devel python37-six python37-numpy python37-setuptools"
+BUILD_REQUIRES="libglut3 libglut-devel libgstreamer1.0-devel libGL-devel libGL1 libGLU-devel libGLU1 libgtk3-devel libgtk3_0 libjpeg-devel libjpeg8 libnotify-devel libnotify libpng-devel libpng16-devel libpng16 libSDL2-devel libSDL2_2.0_0 libSM-devel libSM6 libtiff-devel libtiff6 libwebkitgtk3.0-devel libwebkitgtk3.0_0 libXtst6 python36 python36-devel python36-six python36-numpy python36-setuptools python37 python37-devel python37-six python37-numpy python37-setuptools python38 python38-devel python38-six python38-numpy python38-setuptools"
 
-PKG_NAMES="python3-wx-common python36-wx python37-wx"
+PKG_NAMES="python3-wx-common python36-wx python37-wx python38-wx"
 python3_wx_common_REQUIRES=""
 python3_wx_common_CONTENTS="
 	usr/share/icons/
@@ -46,6 +46,15 @@ python37_wx_CONTENTS="
 	usr/share/applications/*py37*
 "
 
+python38_wx_REQUIRES="python38 python38-six python38-numpy python38-imaging python3-wx-common"
+python38_wx_CONTENTS="
+	etc/
+	usr/bin/*-py38
+	usr/lib/python3.8/site-packages/wx/
+	usr/lib/python3.8/site-packages/wxPython-${VERSION}-*.egg-info
+	usr/share/applications/*py38*
+"
+
 DIFF_EXCLUDES="swigver.h wx.pth *_wrap.cpp .lock-waf_cygwin_build bin build"
 
 src_compile() {
@@ -57,6 +66,9 @@ src_compile() {
 
     echo "Building for Python 3.7..."
     LDFLAGS="-L/usr/lib -lpython3.7m -lX11 -lgtk-3 -lgdk-3" python3.7 build.py build_py --use_syswx --gtk3
+
+    echo "Building for Python 3.8..."
+    LDFLAGS="-L/usr/lib -lpython3.8 -lX11 -lgtk-3 -lgdk-3" python3.8 build.py build_py --use_syswx --gtk3
 
 }
 
@@ -89,8 +101,9 @@ src_install() {
 	make_desktop_entry pycrust-py36    "PyCrust (Python 3.6)"     PyCrust "Development;GTK"
 	make_desktop_entry pyshell-py36    "PyShell (Python 3.6)"     PyCrust "Development;GTK"
 
-    #Remove Python 3.7 DLLs that get installed in Python3.6's site-packages folder.
+    #Remove Python 3.7 & 3.8 DLLs that get installed in Python3.6's site-packages folder.
     find ${D}/usr/lib/python3.6/site-packages/wx/ -iname "*37m*" | xargs rm -v
+    find ${D}/usr/lib/python3.6/site-packages/wx/ -iname "*-38-*" | xargs rm -v
 
     #------------ Python 3.7 ----------------
     python3.7 build.py --destdir=${D} install_py
@@ -112,6 +125,36 @@ src_install() {
 	make_desktop_entry pycrust-py37    "PyCrust (Python 3.7)"    PyCrust "Development;GTK"
 	make_desktop_entry pyshell-py37    "PyShell (Python 3.7)"    PyCrust "Development;GTK"
 
-    #Remove Python 3.6 DLLs that get installed in Python3.7's site-packages folder.
+    #Remove Python 3.6 & 3.8 DLLs that get installed in Python3.7's site-packages folder.
     find ${D}/usr/lib/python3.7/site-packages/wx/ -iname "*36m*" | xargs rm -v
+    find ${D}/usr/lib/python3.7/site-packages/wx/ -iname "*-38-*" | xargs rm -v
+
+    #------------ Python 3.8 ----------------
+    python3.8 build.py --destdir=${D} install_py
+
+    #Move items from /usr/local to /usr.
+    mv -v ${D}/usr/local/bin/* ${D}/usr/bin/
+    mv -v ${D}/usr/local/lib/python3.8 ${D}/usr/lib/python3.8
+    rm -r ${D}/usr/local
+    
+    #Fix name conflicts with executables from python-wx.
+    mv -v ${D}/usr/bin/helpviewer ${D}/usr/bin/helpviewer-py38
+    mv -v ${D}/usr/bin/img2png ${D}/usr/bin/img2png-py38
+    mv -v ${D}/usr/bin/img2py ${D}/usr/bin/img2py-py38
+    mv -v ${D}/usr/bin/img2xpm ${D}/usr/bin/img2xpm-py38
+    mv -v ${D}/usr/bin/pycrust ${D}/usr/bin/pycrust-py38
+    mv -v ${D}/usr/bin/pyshell ${D}/usr/bin/pyshell-py38
+    mv -v ${D}/usr/bin/pyslices ${D}/usr/bin/pyslices-py38
+    mv -v ${D}/usr/bin/pyslicesshell ${D}/usr/bin/pyslicesshell-py38
+    mv -v ${D}/usr/bin/pywxrc ${D}/usr/bin/pywxrc-py38
+    mv -v ${D}/usr/bin/wxdemo ${D}/usr/bin/wxdemo-py38
+    mv -v ${D}/usr/bin/wxdocs ${D}/usr/bin/wxdocs-py38
+    mv -v ${D}/usr/bin/wxget ${D}/usr/bin/wxget-py38
+
+	make_desktop_entry pycrust-py38    "PyCrust (Python 3.8)"    PyCrust "Development;GTK"
+	make_desktop_entry pyshell-py38    "PyShell (Python 3.8)"    PyCrust "Development;GTK"
+
+    #Remove Python 3.6 & 3.7 DLLs that get installed in Python3.8's site-packages folder.
+    find ${D}/usr/lib/python3.8/site-packages/wx/ -iname "*36m*" | xargs rm -v
+    find ${D}/usr/lib/python3.8/site-packages/wx/ -iname "*37m*" | xargs rm -v
 }
