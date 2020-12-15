@@ -4,7 +4,7 @@ inherit python3-distutils wxwidgets
 
 NAME="python3-wx"
 VERSION=4.0.7.post2
-RELEASE=3
+RELEASE=4
 CATEGORY="Python"
 SUMMARY="wxWidgets C++ application framework (Python 3 bindings)"
 DESCRIPTION="wxWidgets is a set of libraries that allows C++ applications to
