@@ -21,7 +21,7 @@ PATCH_URI="
 	4.1.1-fix-sipgridwxGridEvent_overrides.patch
 "
 
-BUILD_REQUIRES="libglut3 libglut-devel libgstreamer1.0-devel libGL-devel libGL1 libGLU-devel libGLU1 libgtk3-devel libgtk3_0 libjpeg-devel libjpeg8 libnotify-devel libnotify libpng-devel libpng16-devel libpng16 libSDL2-devel libSDL2_2.0_0 libSM-devel libSM6 libtiff-devel libtiff6 libwebkitgtk3.0-devel libwebkitgtk3.0_0 libXtst6 libwx_gtk3u3.0_0 libwx_gtk3u3.0-devel python3-devel python36 python36-devel python36-six python36-numpy python36-setuptools python37 python37-devel python37-six python37-numpy python37-setuptools python38 python38-devel python38-six python38-numpy python38-setuptools python39 python39-devel python39-six python39-numpy python39-setuptools"
+BUILD_REQUIRES="libglut3 libglut-devel libgstreamer1.0-devel libGL-devel libGL1 libGLU-devel libGLU1 libgtk3-devel libgtk3_0 libjpeg-devel libjpeg8 libnotify-devel libnotify libpng-devel libpng16-devel libpng16 libSDL2-devel libSDL2_2.0_0 libSM-devel libSM6 libtiff-devel libtiff6 libwebkitgtk3.0-devel libwebkitgtk3.0_0 libXtst6 libwx_gtk3u3.1_5 libwx_gtk3u3.1-devel python3-devel python36 python36-devel python36-six python36-numpy python36-setuptools python37 python37-devel python37-six python37-numpy python37-setuptools python38 python38-devel python38-six python38-numpy python38-setuptools python39 python39-devel python39-six python39-numpy python39-setuptools"
 
 PKG_NAMES="python3-wx-common python36-wx python37-wx python38-wx python39-wx"
 python3_wx_common_REQUIRES="libwx_baseu3.1_5 libwx_gtk3u3.1_5"
