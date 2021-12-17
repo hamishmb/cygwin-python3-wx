@@ -1,10 +1,10 @@
-WX_VERSION=3.0
+WX_VERSION=3.1
 WX_TOOLKIT="gtk3"
 inherit python3-distutils wxwidgets
 
 NAME="python3-wx"
-VERSION=4.0.7.post2
-RELEASE=4
+VERSION=4.1.1
+RELEASE=1
 CATEGORY="Python"
 SUMMARY="wxWidgets C++ application framework (Python 3 bindings)"
 DESCRIPTION="wxWidgets is a set of libraries that allows C++ applications to
@@ -15,14 +15,16 @@ commonly-used operating system facilities, from copying and deleting files to
 socket and thread support. This package provides wxPython Phoenix, the Python 3
 bindings to be used with wxwidgets"
 HOMEPAGE="http://wxpython.org/"
-SRC_URI="https://files.pythonhosted.org/packages/b9/8b/31267dd6d026a082faed35ec8d97522c0236f2e083bf15aff64d982215e1/wxPython-4.0.7.post2.tar.gz"
+SRC_URI="https://files.pythonhosted.org/packages/b0/4d/80d65c37ee60a479d338d27a2895fb15bbba27a3e6bb5b6d72bb28246e99/wxPython-4.1.1.tar.gz"
 SRC_DIR="wxPython-${VERSION}"
-PATCH_URI=""
+PATCH_URI="
+	4.1.1-fix-sipgridwxGridEvent_overrides.patch
+"
 
-BUILD_REQUIRES="libglut3 libglut-devel libgstreamer1.0-devel libGL-devel libGL1 libGLU-devel libGLU1 libgtk3-devel libgtk3_0 libjpeg-devel libjpeg8 libnotify-devel libnotify libpng-devel libpng16-devel libpng16 libSDL2-devel libSDL2_2.0_0 libSM-devel libSM6 libtiff-devel libtiff6 libwebkitgtk3.0-devel libwebkitgtk3.0_0 libXtst6 python36 python36-devel python36-six python36-numpy python36-setuptools python37 python37-devel python37-six python37-numpy python37-setuptools python38 python38-devel python38-six python38-numpy python38-setuptools"
+BUILD_REQUIRES="libglut3 libglut-devel libgstreamer1.0-devel libGL-devel libGL1 libGLU-devel libGLU1 libgtk3-devel libgtk3_0 libjpeg-devel libjpeg8 libnotify-devel libnotify libpng-devel libpng16-devel libpng16 libSDL2-devel libSDL2_2.0_0 libSM-devel libSM6 libtiff-devel libtiff6 libwebkitgtk3.0-devel libwebkitgtk3.0_0 libXtst6 libwx_gtk3u3.0_0 libwx_gtk3u3.0-devel python3-devel python36 python36-devel python36-six python36-numpy python36-setuptools python37 python37-devel python37-six python37-numpy python37-setuptools python38 python38-devel python38-six python38-numpy python38-setuptools python39 python39-devel python39-six python39-numpy python39-setuptools"
 
-PKG_NAMES="python3-wx-common python36-wx python37-wx python38-wx"
-python3_wx_common_REQUIRES=""
+PKG_NAMES="python3-wx-common python36-wx python37-wx python38-wx python39-wx"
+python3_wx_common_REQUIRES="libwx_baseu3.1_5 libwx_gtk3u3.1_5"
 python3_wx_common_CONTENTS="
 	usr/share/icons/
     usr/share/doc
@@ -55,20 +57,54 @@ python38_wx_CONTENTS="
 	usr/share/applications/*py38*
 "
 
+python39_wx_REQUIRES="python39 python39-six python39-numpy python39-imaging python3-wx-common"
+python39_wx_CONTENTS="
+	etc/
+	usr/bin/*-py39
+	usr/lib/python3.9/site-packages/wx/
+	usr/lib/python3.9/site-packages/wxPython-${VERSION}-*.egg-info
+	usr/share/applications/*py39*
+"
+
 DIFF_EXCLUDES="swigver.h wx.pth *_wrap.cpp .lock-waf_cygwin_build bin build"
 
 src_compile() {
 	lndirs
 	cd ${B}
 
+    #------------ Python 3.6 ----------------
+    mkdir -p py36
+    cd py36
+    
     echo "Building for Python 3.6..."
-	LDFLAGS="-L/usr/lib -lpython3.6m -lX11 -lgtk-3 -lgdk-3" python3.6 build.py build_py --use_syswx --gtk3
+	LDFLAGS="-L/usr/lib -lpython3.6m -lX11 -lgtk-3 -lgdk-3" python3.6 ../build.py build_py --use_syswx --gtk3
+
+	cd ${B}
+
+    #------------ Python 3.7 ----------------
+    mkdir -p py37
+    cd py37
 
     echo "Building for Python 3.7..."
-    LDFLAGS="-L/usr/lib -lpython3.7m -lX11 -lgtk-3 -lgdk-3" python3.7 build.py build_py --use_syswx --gtk3
+    LDFLAGS="-L/usr/lib -lpython3.7m -lX11 -lgtk-3 -lgdk-3" python3.7 ../build.py build_py --use_syswx --gtk3
+
+	cd ${B}
+
+    #------------ Python 3.8 ----------------
+    mkdir -p py38
+    cd py38
 
     echo "Building for Python 3.8..."
-    LDFLAGS="-L/usr/lib -lpython3.8 -lX11 -lgtk-3 -lgdk-3" python3.8 build.py build_py --use_syswx --gtk3
+    LDFLAGS="-L/usr/lib -lpython3.8 -lX11 -lgtk-3 -lgdk-3" python3.8 ../build.py build_py --use_syswx --gtk3
+
+    cd ${B}
+
+    #------------ Python 3.9 ----------------
+    mkdir -p py39
+    cd py39
+
+    echo "Building for Python 3.9..."
+    LDFLAGS="-L/usr/lib -lpython3.9 -lX11 -lgtk-3 -lgdk-3" python3.9 ../build.py build_py --use_syswx --gtk3
 
 }
 
@@ -76,7 +112,9 @@ src_install() {
 	cd ${B}
 
     #------------ Python 3.6 ----------------
-	python3.6 build.py --destdir=${D} install_py
+    cd py36
+	
+	python3.6 ../build.py --destdir=${D} install_py
 
 	for i in 16 32
 	do
@@ -101,12 +139,18 @@ src_install() {
 	make_desktop_entry pycrust-py36    "PyCrust (Python 3.6)"     PyCrust "Development;GTK"
 	make_desktop_entry pyshell-py36    "PyShell (Python 3.6)"     PyCrust "Development;GTK"
 
-    #Remove Python 3.7 & 3.8 DLLs that get installed in Python3.6's site-packages folder.
+    #Remove Python 3.7 & 3.8 & 3.9 DLLs that get installed in Python3.6's site-packages folder.
+	echo "Removing DLLs for other Python versions from the site-packages directory..."
     find ${D}/usr/lib/python3.6/site-packages/wx/ -iname "*37m*" | xargs rm -v
     find ${D}/usr/lib/python3.6/site-packages/wx/ -iname "*-38-*" | xargs rm -v
+    find ${D}/usr/lib/python3.6/site-packages/wx/ -iname "*-39-*" | xargs rm -v
 
+    cd ${B}
+	
     #------------ Python 3.7 ----------------
-    python3.7 build.py --destdir=${D} install_py
+    cd py37
+	
+    python3.7 ../build.py --destdir=${D} install_py
 
     #Fix name conflicts with executables from python-wx.
     mv -v ${D}/usr/bin/helpviewer ${D}/usr/bin/helpviewer-py37
@@ -125,12 +169,18 @@ src_install() {
 	make_desktop_entry pycrust-py37    "PyCrust (Python 3.7)"    PyCrust "Development;GTK"
 	make_desktop_entry pyshell-py37    "PyShell (Python 3.7)"    PyCrust "Development;GTK"
 
-    #Remove Python 3.6 & 3.8 DLLs that get installed in Python3.7's site-packages folder.
+    #Remove Python 3.6 & 3.8 & 3.9 DLLs that get installed in Python3.7's site-packages folder.
+	echo "Removing DLLs for other Python versions from the site-packages directory..."
     find ${D}/usr/lib/python3.7/site-packages/wx/ -iname "*36m*" | xargs rm -v
     find ${D}/usr/lib/python3.7/site-packages/wx/ -iname "*-38-*" | xargs rm -v
+    find ${D}/usr/lib/python3.7/site-packages/wx/ -iname "*-39-*" | xargs rm -v
 
+    cd ${B}
+	
     #------------ Python 3.8 ----------------
-    python3.8 build.py --destdir=${D} install_py
+    cd py38
+	
+    python3.8 ../build.py --destdir=${D} install_py
 
     #Move items from /usr/local to /usr.
     mv -v ${D}/usr/local/bin/* ${D}/usr/bin/
@@ -154,7 +204,46 @@ src_install() {
 	make_desktop_entry pycrust-py38    "PyCrust (Python 3.8)"    PyCrust "Development;GTK"
 	make_desktop_entry pyshell-py38    "PyShell (Python 3.8)"    PyCrust "Development;GTK"
 
-    #Remove Python 3.6 & 3.7 DLLs that get installed in Python3.8's site-packages folder.
+    #Remove Python 3.6 & 3.7 & 3.9 DLLs that get installed in Python3.8's site-packages folder.
+	echo "Removing DLLs for other Python versions from the site-packages directory..."
     find ${D}/usr/lib/python3.8/site-packages/wx/ -iname "*36m*" | xargs rm -v
     find ${D}/usr/lib/python3.8/site-packages/wx/ -iname "*37m*" | xargs rm -v
+    find ${D}/usr/lib/python3.8/site-packages/wx/ -iname "*-39-*" | xargs rm -v
+
+    cd ${B}
+
+    #------------ Python 3.9 ----------------
+    cd py39
+	
+    python3.9 ../build.py --destdir=${D} install_py
+
+    #Move items from /usr/local to /usr.
+    mv -v ${D}/usr/local/bin/* ${D}/usr/bin/
+    mv -v ${D}/usr/local/lib/python3.9 ${D}/usr/lib/python3.9
+    rm -r ${D}/usr/local
+    
+    #Fix name conflicts with executables from python-wx.
+    mv -v ${D}/usr/bin/helpviewer ${D}/usr/bin/helpviewer-py39
+    mv -v ${D}/usr/bin/img2png ${D}/usr/bin/img2png-py39
+    mv -v ${D}/usr/bin/img2py ${D}/usr/bin/img2py-py39
+    mv -v ${D}/usr/bin/img2xpm ${D}/usr/bin/img2xpm-py39
+    mv -v ${D}/usr/bin/pycrust ${D}/usr/bin/pycrust-py39
+    mv -v ${D}/usr/bin/pyshell ${D}/usr/bin/pyshell-py39
+    mv -v ${D}/usr/bin/pyslices ${D}/usr/bin/pyslices-py39
+    mv -v ${D}/usr/bin/pyslicesshell ${D}/usr/bin/pyslicesshell-py39
+    mv -v ${D}/usr/bin/pywxrc ${D}/usr/bin/pywxrc-py39
+    mv -v ${D}/usr/bin/wxdemo ${D}/usr/bin/wxdemo-py39
+    mv -v ${D}/usr/bin/wxdocs ${D}/usr/bin/wxdocs-py39
+    mv -v ${D}/usr/bin/wxget ${D}/usr/bin/wxget-py39
+
+	make_desktop_entry pycrust-py39    "PyCrust (Python 3.9)"    PyCrust "Development;GTK"
+	make_desktop_entry pyshell-py39    "PyShell (Python 3.9)"    PyCrust "Development;GTK"
+
+    #Remove Python 3.6 & 3.7 & 3.8 DLLs that get installed in Python3.9's site-packages folder.
+	echo "Removing DLLs for other Python versions from the site-packages directory..."
+    find ${D}/usr/lib/python3.9/site-packages/wx/ -iname "*36m*" | xargs rm -v
+    find ${D}/usr/lib/python3.9/site-packages/wx/ -iname "*37m*" | xargs rm -v
+    find ${D}/usr/lib/python3.9/site-packages/wx/ -iname "*-38-*" | xargs rm -v
+
+    cd ${B}
 }
